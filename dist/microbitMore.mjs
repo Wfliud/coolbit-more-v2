@@ -7219,6 +7219,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
           arguments: {
             PIN: {
               type: ArgumentType.STRING,
+              acceptReporters: false,
               menu: {
                 P1: 'P1',
                 P2: 'P2',
