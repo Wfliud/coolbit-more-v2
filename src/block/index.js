@@ -2565,27 +2565,30 @@ class MbitMoreBlocks {
                     }
                 },
                 {
-                    opcode: 'setservo',
-                    text:formatMessage({
-                        id: 'mbitMore.setservo',
-                        default: 'set [PIN] Servo rotate to [ANG]',
-                        description: 'Set the servo to specified angle'
+                    opcode: 'setServo',
+                    text: formatMessage({
+                        id: 'mbitMore.setServo',
+                        default: 'set [PIN] Servo [ANGLE]',
+                        description: 'set pin to Servo mode and the angle(0 to 180)'
                     }),
-                    blockType:BlockType.COMMAND,
+                    blockType: BlockType.COMMAND,
                     arguments: {
                         PIN: {
                             type: ArgumentType.STRING,
-                            acceptReporters:false,
-                            menu:{
-                                P1:'P1',
-                                P2:'P2',
-                                P16:'P16'
-                            },
-                            defaultValue: 'P1'
+                            menu: 'gpio',
+                            defaultValue: '0'
                         },
-                        ANG: {
-                            type:ArgumentType.NUMBER,
-                            defaultValue:0
+                        ANGLE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0
+                        },
+                        RANGE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 2000
+                        },
+                        CENTER: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1500
                         }
                     }
                 },
@@ -3162,13 +3165,18 @@ class MbitMoreBlocks {
      * @return {promise | undefined} - a Promise that resolves when the command was sent
      *                                 or undefined if this process was yield.
      */
-    setservo(args,util){
-        let pin=1-Number(args.PIN=='P1');if(args.PIN=='P16')pin=2;
-        let ang=parseInt(args.ANG,10);
-        if(isNaN(ang))return;
-        ang=Math.max(0,Math.min(ang,180));
-        let data='a'+String(pin)+Math.max(0,ang/100-0.5).toFixed()+Math.max(0,(ang/10-0.5)%10).toFixed()+(ang%10).toFixed()+'0';
-        return this._peripheral.sendData('motion',data,util);
+    setServo (args, util) {
+        let angle = parseInt(args.ANGLE, 10);
+        if (isNaN(angle)) return;
+        angle = Math.max(0, angle);
+        angle = Math.min(angle, 180);
+        // let range = parseInt(args.RANGE, 10);
+        // if (isNaN(range)) range = 0;
+        // range = Math.max(0, range);
+        // let center = parseInt(args.CENTER, 10);
+        // if (isNaN(center)) range = 0;
+        // center = Math.max(0, center);
+        return this._peripheral.setPinServo(parseInt(args.PIN, 10), angle, null, null, util);
     }
 
     /**
