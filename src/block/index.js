@@ -2580,7 +2580,7 @@ class MbitMoreBlocks {
                                 P2:'P2',
                                 P16:'P16'
                             },
-                            defaultValue: P16
+                            defaultValue: 'P1'
                         },
                         ANG: {
                             type:ArgumentType.NUMBER,
