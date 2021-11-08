@@ -24,7 +24,7 @@ var translationMap = {
 var entry = {
   name: 'Microbit More',
   extensionId: 'microbitMore',
-  extensionURL: 'https://microbit-more.github.io/dist/microbitMore.mjs',
+  extensionURL: 'https://wfliud.github.io/coolbit-more-v2/dist/microbitMore.mjs',
   collaborator: 'Yengawa Lab',
   iconURL: img$3,
   insetIconURL: img$2,
@@ -5296,6 +5296,15 @@ var AxisSymbol = {
   Z: 'z',
   Absolute: 'absolute'
 };
+
+var MotorPin = {
+  P5: 'P5/11',
+  P8: 'P8/12'
+};
+var Direction ={
+  Forward: 'Forward',
+  Backward: 'Backward'
+};
 /**
  * The unit-value of the gravitational acceleration from Micro:bit.
  * @type {number}
@@ -6968,6 +6977,50 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
       }];
     }
   }, {
+    key: "MOTORPIN_MENU",
+    get: function MOTORPIN_MENU(){
+      return [
+          {
+              text:formatMessage({
+                  id: 'mbitMore.motorpin.a',
+                  default: 'P5/11',
+                  description: 'MotorPin called 5/11'
+              }),
+              value: MotorPin.P5
+          },
+          {
+              text:formatMessage({
+                  id: 'mbitMore.motorpin.b',
+                  default: 'P8/12',
+                  description: 'MotorPin called 8/12'
+              }),
+              value: MotorPin.P8                
+          }
+      ];
+  }
+},{
+  key: "DIR_MENU",
+  get: function DIR_MENU(){
+      return[
+          {
+              text:formatMessage({
+                  id: 'mbitMore.dir.for',
+                  default: 'Forward',
+                  description: 'Forward'
+              }),
+              value: Direction.Forward
+          },
+          {
+              text:formatMessage({
+                  id: 'mbitMore.dir.bac',
+                  default: 'Baclward',
+                  description: 'Backward'
+              }),
+              value: Direction.Backward
+          },
+      ]
+  }
+  },{
     key: "AXIS_MENU",
     get: function get() {
       return [{
@@ -7501,7 +7554,31 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
               defaultValue: 1500
             }
           }
-        }, {
+        },{
+					opcode: 'setmotor',
+					text: formatMessage({
+						id: 'mbitMore.setmotor',
+						default: 'set [PIN] Motor rotate [DIR] at [SPEED]',
+						description: 'Sets the motor to rotate in the specified direction at the specified speed(0 to 255)'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						PIN: {
+							type: ArgumentType.STRING,
+							menu: 'motorpin',
+							defaultValue: 'P5/11'
+						},
+						SPEED: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 0
+						},
+						DIR: {
+							type: ArgumentType.STRING,
+							menu: 'dir',
+							defaultValue: 'Forward'
+						}
+					}
+				}, {
           opcode: 'playTone',
           text: formatMessage({
             id: 'mbitMore.playTone',
@@ -7666,6 +7743,13 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
           gpio: {
             acceptReporters: false,
             items: this.GPIO_MENU
+          },
+          motorpin: {
+              items: this.MOTORPIN_MENU
+          },
+          dir: {
+              acceptReporters:false,
+              items: this.DIR_MENU
           },
           axis: {
             acceptReporters: false,
@@ -8178,14 +8262,26 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
 
       return this._peripheral.setPinServo(parseInt(args.PIN, 10), angle, null, null, util);
     }
+
+  }, {
+    key:"setmotor",
+    value: function setmotor(args,util){
+    let pin = 1-Number(args.PIN=="P5/11");
+    let spd = parseInt(args.SPEED,10);
+    let dir = 1-Number(args.DIR=="Forward");
+    if (isNaN(spd)) return;
+    spd=Math.max(0,spd);
+    spd=Math.min(spd,255);
+    let data='b'+String(pin)+Math.max(0,spd/100-0.5).toFixed()+Math.max(0,(spd/10-0.5)%10).toFixed()+(spd%10).toFixed()+String(dir);
+    return this._peripheral.sendData('motion',data,util);
+}
     /**
      * Return the value of magnetic force [micro tesla] on axis.
      * @param {object} args - the block's arguments.
      * @property {AxisSymbol} AXIS - the axis (X, Y, Z, Absolute).
      * @return {number} - value of magnetic force.
      */
-
-  }, {
+},{
     key: "getMagneticForce",
     value: function getMagneticForce(args) {
       return this._peripheral.readMagneticForce(args.AXIS);
