@@ -5305,7 +5305,7 @@ var Direction ={
   Forward: 'Forward',
   Backward: 'Backward',
   LEFT: 'Turn Left',
-  RIGHT: 'Turn right',
+  RIGHT: 'Turn Right',
   STOP: 'STOP'
 };
 /**
@@ -7047,7 +7047,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
           text:formatMessage({
             id: 'mbitMore.mov.lft',
             default: Direction.LEFT,
-            description: 'Turn left'
+            description: 'Turn Left'
           }),
           value: Direction.LEFT
         },
@@ -7055,7 +7055,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
           text:formatMessage({
             id: 'mbitMore.mov.rgt',
             default: Direction.RIGHT,
-            description: 'Turn right'
+            description: 'Turn Right'
           }),
           value: Direction.RIGHT
         },
