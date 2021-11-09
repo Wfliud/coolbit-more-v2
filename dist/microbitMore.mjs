@@ -5303,7 +5303,10 @@ var MotorPin = {
 };
 var Direction ={
   Forward: 'Forward',
-  Backward: 'Backward'
+  Backward: 'Backward',
+  LEFT: 'Turn Left',
+  RIGHT: 'Turn right',
+  STOP: 'STOP'
 };
 /**
  * The unit-value of the gravitational acceleration from Micro:bit.
@@ -6976,6 +6979,96 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
         value: 'true'
       }];
     }
+  },{
+    key: "MOTORPIN_MENU",
+    get: function MOTORPIN_MENU(){
+      return [
+          {
+              text:formatMessage({
+                  id: 'mbitMore.motorpin.a',
+                  default: 'P5/11',
+                  description: 'MotorPin called 5/11'
+              }),
+              value: MotorPin.P5
+          },
+          {
+              text:formatMessage({
+                  id: 'mbitMore.motorpin.b',
+                  default: 'P8/12',
+                  description: 'MotorPin called 8/12'
+              }),
+              value: MotorPin.P8                
+          }
+      ];
+  }
+},{
+  key: "DIR_MENU",
+  get: function DIR_MENU(){
+      return[
+          {
+              text:formatMessage({
+                  id: 'mbitMore.dir.for',
+                  default: 'Forward',
+                  description: 'Forward'
+              }),
+              value: Direction.Forward
+          },
+          {
+              text:formatMessage({
+                  id: 'mbitMore.dir.bac',
+                  default: 'Baclward',
+                  description: 'Backward'
+              }),
+              value: Direction.Backward
+          },
+      ]
+  }
+  },{
+    key: "CARMOVE_MENU",
+    get: function CARMOVE_MENU(){
+      return[
+        {
+          text:formatMessage({
+            id: 'mbitMore.mov.for',
+            default: 'Forward',
+            description: 'Forward'
+          }),
+          value: Direction.Forward
+        },
+        {
+          text:formatMessage({
+            id: 'mbitMore.mov.bac',
+            default: 'Backward',
+            description: 'Backward'
+          }),
+          value: Direction.Backward
+        },
+        {
+          text:formatMessage({
+            id: 'mbitMore.mov.lft',
+            default: Direction.LEFT,
+            description: 'Turn left'
+          }),
+          value: Direction.LEFT
+        },
+        {
+          text:formatMessage({
+            id: 'mbitMore.mov.rgt',
+            default: Direction.RIGHT,
+            description: 'Turn right'
+          }),
+          value: Direction.RIGHT
+        },
+        {
+          text:formatMessage({
+            id: 'mbitMore.mov.stp',
+            default: Direction.STOP,
+            description: 'Stop'
+          }),
+          value: Direction.STOP
+        }
+      ]
+    }
   }, {
     key: "AXIS_MENU",
     get: function get() {
@@ -7535,6 +7628,25 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
             }
           }
         }, {
+          opcode: 'setcar',
+          text: formatMessage({
+            id: 'mbitMore.setcar',
+            default:'set car [MOV] at speed [SPEED]',
+            description: 'Set the car go any direction at specified speed(0 to 255)'
+          }),
+          blockType: BlockType.COMMAND,
+          arguments:{
+            MOV: {
+              type: ArgumentType.STRING,
+              menu: 'carmove',
+              defaultValue: 'Forward'
+            },
+            SPEED: {
+              type:ArgumentType.NUMBER,
+              defaultValue: 0
+            }
+          }
+        },{
           opcode: 'playTone',
           text: formatMessage({
             id: 'mbitMore.playTone',
@@ -7701,11 +7813,16 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
             items: this.GPIO_MENU
           },
           motorpin: {
+            acceptReporters: false,
             items: this.MOTORPIN_MENU
           },
           dir: {
             acceptReporters: false,
             items: this.DIR_MENU
+          },
+          carmove:  {
+            acceptReporters: false,
+            items: this.CARMOVE_MENU
           },
           axis: {
             acceptReporters: false,
@@ -8236,6 +8353,22 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
      * @property {AxisSymbol} AXIS - the axis (X, Y, Z, Absolute).
      * @return {number} - value of magnetic force.
      */
+},{
+  key: "setcar",
+  value: function setcar(args,util){
+    var dir=0;
+    var spd=parseInt(args.SPEED,10);
+    switch (args.MOV) {
+      case 'Forward':dir=0;break;
+      case 'Backward':dir=1;break;
+      case 'Turn Left':dir=2;break;
+      case 'Turn Right':dir=3;break;    
+      default:dir=4;break;
+    }
+    if (isNaN(spd))return;
+    spd=Math.max(0,Math.min(spd,255));
+    var data = 'c0'+Math.max(0, spd / 100 - 0.5).toFixed() + Math.max(0, (spd / 10 - 0.5) % 10).toFixed() + (spd % 10).toFixed() + String(dir);    
+    return this._peripheral.sendData('motion', data, util);}
 },{
     key: "getMagneticForce",
     value: function getMagneticForce(args) {
