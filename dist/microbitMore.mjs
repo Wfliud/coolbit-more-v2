@@ -5296,7 +5296,16 @@ var AxisSymbol = {
   Z: 'z',
   Absolute: 'absolute'
 };
-
+var Coolpin={
+  P0:'P0',
+  P1:'P1',
+  P2:'P2',
+  P16:'P16',
+  P5:'P5/11',
+  P8:'P8/12',
+  P13:'P13/14',
+  P15:'P15/16'
+};
 var MotorPin = {
   P5: 'P5/11',
   P8: 'P8/12'
@@ -5307,6 +5316,10 @@ var Direction ={
   LEFT: 'Turn Left',
   RIGHT: 'Turn Right',
   STOP: 'STOP'
+};
+var Soincpin ={
+    P13:'P13/14',
+    P15:'P15/16'
 };
 /**
  * The unit-value of the gravitational acceleration from Micro:bit.
@@ -6989,7 +7002,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
                   default: 'P5/11',
                   description: 'MotorPin called 5/11'
               }),
-              value: MotorPin.P5
+              value: Coolpin.P5
           },
           {
               text:formatMessage({
@@ -6997,7 +7010,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
                   default: 'P8/12',
                   description: 'MotorPin called 8/12'
               }),
-              value: MotorPin.P8                
+              value: Coolpin.P8                
           }
       ];
   }
@@ -7070,6 +7083,25 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
       ]
     }
   }, {
+    key:"SONICPIN_MENU",
+    get: function get(){
+      return[{
+        text: formatMessage({
+          id: 'mbitMore.sonic.p13',
+          default: Coolpin.P13,
+          description: 'pin at P13/14'
+        }),
+        value: Coolpin.P13
+      },{
+        text: formatMessage({
+          id: 'mbitMore.sonic.p15',
+          default: Coolpin.P15,
+          description: 'pin at P15/16'
+        }),
+        value: Coolpin.P15
+      }]
+    }
+  },{
     key: "AXIS_MENU",
     get: function get() {
       return [{
@@ -7647,6 +7679,21 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
             }
           }
         },{
+          opcode: 'sonicinit',
+          text: formatMessage({
+            id: 'mbitMore.sonicinit',
+            default:'set sonic port at [PIN]',
+            description:' Set the sonic port at a desire pin'
+          }),
+          blockType: BlockType.COMMAND,
+          arguments:{
+            PIN:{
+              type:ArgumentType.STRING,
+              menu:'sonicpin',
+              defaultValue:'0'
+            }
+          }
+        },{
           opcode: 'playTone',
           text: formatMessage({
             id: 'mbitMore.playTone',
@@ -7823,6 +7870,10 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
           carmove:  {
             acceptReporters: false,
             items: this.CARMOVE_MENU
+          },
+          sonicpin:{
+            acceptReporters:false,
+            items:this.SONICPIN_MENU
           },
           axis: {
             acceptReporters: false,
@@ -8367,8 +8418,17 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
     }
     if (isNaN(spd))return;
     spd=Math.max(0,Math.min(spd,255));
-    var data = 'c0'+Math.max(0, spd / 100 - 0.5).toFixed() + Math.max(0, (spd / 10 - 0.5) % 10).toFixed() + (spd % 10).toFixed() + String(dir);    
-    return this._peripheral.sendData('motion', data, util);}
+    var data = 'c0'+Math.max(0, spd / 100 - 0.5).toFixed() + Math.max(0, (spd / 10 - 0.5) % 10).toFixed() + (spd % 10).toFixed() + String(dir);  
+    console.log(data);  
+    return this._peripheral.sendData('motion', data, util);
+  }
+},{
+  key: "sonicinit",
+  value: function sonicinit(args,util){
+    var pin=1-Number(args.PIN=="P13/14");
+    var data ='a'+String(pin);
+    return this._peripheral.sendData('sonic',data,util);
+  }
 },{
     key: "getMagneticForce",
     value: function getMagneticForce(args) {
