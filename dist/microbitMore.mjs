@@ -8394,7 +8394,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
       var dir = 1 - Number(args.DIR == "Forward");
       if (isNaN(spd)) return;
       spd = Math.max(0, Math.min(spd, 255));
-      zfix=3-String(spd).length;
+      var zfix=3-String(spd).length;
       var data = 'b'+String(pin)+((zfix==0)? '':(zfix==1)?'0':'00')+String(spd)+String(dir);
       return this._peripheral.sendData('motion', data, util);
     }
@@ -8418,7 +8418,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
     }
     if (isNaN(spd))return;
     spd=Math.max(0,Math.min(spd,255));
-    zfix=3-String(spd).length;
+    var zfix=3-String(spd).length;
   	var data = 'c0'+((zfix==0)? '':(zfix==1)?'0':'00')+String(spd)+String(dir);
     console.log(data);  
     return this._peripheral.sendData('motion', data, util);
