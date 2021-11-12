@@ -7690,7 +7690,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
             PIN:{
               type:ArgumentType.STRING,
               menu:'sonicpin',
-              defaultValue:'0'
+              defaultValue:'P13/14'
             }
           }
         },{
@@ -8420,7 +8420,7 @@ var MbitMoreBlocks = /*#__PURE__*/function () {
     spd=Math.max(0,Math.min(spd,255));
     var zfix=3-String(spd).length;
   	var data = 'c0'+((zfix==0)? '':(zfix==1)?'0':'00')+String(spd)+String(dir);
-    console.log(data);  
+    //console.log(data);  
     return this._peripheral.sendData('motion', data, util);
   }
 },{
